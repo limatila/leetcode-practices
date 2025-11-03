@@ -4,19 +4,29 @@ class Solution:
     going_right: bool = True
     count_selections: int = 0
 
+    def change_direction(self, choice: bool = None):
+        if choice is not None: self.going_right = choice
+        self.going_right = not self.going_right
+    
+    def choose_starting_point(self, zero_selection: int) -> int:
+        if self.going_right:
+            return zero_selection - 1
+        else: 
+            return zero_selection + 1
+
     def will_go_out_of_bounds(self, index: int, nums: list[int]):
+        # print(f"analysing bounds on: {index}")
+        # return index < 0 or index > len(nums) - 1
+        
         print(f"analysing bounds on: {index}, {'going right' if self.going_right else 'going left'}")
+        ultimo_index = (len(nums) - 1)
+        
         if self.going_right:
             #checa se uma adição ao valor sair dos index
-            ultimo_index = (len(nums) - 1)
             return (index + 1) > ultimo_index
         else:
             #checa se uma remoção ao valor sair dos index
             return (index - 1) < 0
-
-    def change_direction(self, choice: bool = None):
-        if choice is not None: self.going_right = choice
-        self.going_right = not self.going_right
 
     def countValidSelections(self, nums: list[int]) -> int:
         current_index: int = 0
@@ -30,10 +40,16 @@ class Solution:
         for possible_selection in list_possible_selections:
             for direction_choice in [True, False]:
                 self.change_direction(direction_choice)
-                current_index = possible_selection
+                current_index = self.choose_starting_point(possible_selection)
                 nums_copy = list(nums)
                 if self.will_go_out_of_bounds(current_index, nums_copy):
                     print(f"skipado out of bounds: {'going right' if self.going_right else 'going left'} para {nums_copy}")
+                    continue
+                if (current_index < len(nums_copy) - 1 and
+                    nums_copy[current_index] == 0 and 
+                    current_index != -1
+                ):
+                    print(f"skipado 0 agregado: {'going right' if self.going_right else 'going left'} a partir de posição {current_index}")
                     continue
 
                 print('starting:', nums_copy)
